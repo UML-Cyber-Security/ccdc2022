@@ -24,3 +24,5 @@ Put the users *public* key in the files directory for each user.
 `ansible-playbook playbook.yaml --private-key ./[PRIVATE_KEY]`
 
 The private key is the only authentication required, passwords can also be used with `--ask-pass`.
+
+If you only want to run specific tasks you can use the **-t** flag and then specify the tag/s.

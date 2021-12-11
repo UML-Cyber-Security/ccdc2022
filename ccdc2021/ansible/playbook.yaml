@@ -8,6 +8,14 @@
   - var.yaml
 
   tasks:
+  - name: Change UMASK
+    lineinfile: 
+      dest: "/etc/login.defs" 
+      regexp: '^(#\s*)?UMASK'
+      line: 'UMASK 007'
+    tags:
+    - umask
+
   - name: Update apt packages
     become: true
     apt:
@@ -21,26 +29,25 @@
       name: "{{ apt }}"
     tags:
     - apt
-    - initial
+
 
   - name: Ensure group "{{ CCDC_Group }}" exists
     ansible.builtin.group:
       name: "{{ CCDC_Group }}"
       state: present
     tags:
-    - initial
     - group
 
   - name: "Create user accounts"
     user:
       name: "{{ item }}"
       shell: "/bin/bash"
+      group: "{{ CCDC_Group }}"
       groups:
       - "{{ CCDC_Group }}"
-      #create_home: "False" # Need a place to store ssh files
+      #create_home: "False"   #Need a place to store ssh files
     with_items: "{{ users }}"
     tags:
-    - initial
     - users
 
   - name: "Add authorized keys"
@@ -49,7 +56,6 @@
       key: "{{ lookup('file', 'pub_keys/'+ item + '.id_rsa.pub') }}"
     with_items: "{{ users }}"
     tags:
-    - initial
     - users
     - ssh
 
@@ -60,7 +66,6 @@
       regexp: "^%{{ CCDC_Group }}"
       line: "%{{ CCDC_Group }} ALL=(ALL) NOPASSWD: ALL"
     tags:
-    - initial
     - group
 
   - name: Disable empty password login
@@ -70,7 +75,6 @@
       line: 'PermitEmptyPasswords no'
     notify: restart sshd
     tags:
-    - initial
     - ssh
 
   - name: Disable remote root login
@@ -80,7 +84,6 @@
       line: 'PermitRootLogin no'
     notify: restart sshd
     tags:
-    - initial
     - ssh
 
   - name: Disable password login
@@ -90,17 +93,10 @@
       line: 'PasswordAuthentication no'
     notify: restart sshd
     tags:
-    - initial
     - ssh
-
-  - name: Change UMASK
-    lineinfile: 
-      dest: "/etc/login.defs" 
-      regexp: '^(#\s*)?UMASK'
-      line: 'UMASK 077'
-    tags:
-    - initial
 
   handlers:
   - name: restart sshd
-      service: name=sshd state=restarted
+    service:
+      name=sshd
+      state=restarted
