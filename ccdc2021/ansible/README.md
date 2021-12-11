@@ -1,0 +1,26 @@
+# Ansible Setup
+
+Ansible playbook by Andrew Aiken
+
+## Setup Inventory
+
+Fill in `inventory.ini` with the hosts.
+
+`serverX ansible_host=X.X.X.X`
+
+
+## Setup Variables
+
+Edit the variables in `var.yaml`.
+
+Change **users** array with the users to create on the machine.
+Put the users *public* key in the files directory for each user.
+
+**apt** packages to install on the servers.
+
+
+## Simple run
+
+`ansible-playbook playbook.yaml --private-key ./[PRIVATE_KEY]`
+
+The private key is the only authentication required, passwords can also be used with `--ask-pass`.

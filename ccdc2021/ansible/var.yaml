@@ -1,0 +1,8 @@
+CCDC_Group: "CCDC_Admin"
+sshd_config: "/etc/ssh/sshd_config"
+users:
+- "foo"
+apt:
+- git
+- vim
+- fail2ban
