@@ -3,7 +3,6 @@
 - name: setup users
   hosts: servers
   become: true
-  remote_user: ubuntu
   vars_files:
   - var.yaml
 
