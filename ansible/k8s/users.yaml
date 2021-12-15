@@ -1,7 +1,13 @@
-- hosts: 'k8s-workers, k8s-masters'
+- hosts: 'k8s_workers, k8s_masters'
   become: yes
 
   tasks:
+    - name: Set a hostname
+      ansible.builtin.hostname:
+        name: "{{ inventory_hostname }}"
+      tags:
+      - hostname
+
     - name: create the kube user account
       user: name=kube append=yes state=present createhome=yes shell=/bin/bash
 

@@ -17,6 +17,11 @@ ansible-playbook --private-key=./keys/id_rsa master.yaml
 ansible-playbook --private-key=./keys/id_rsa join-workers.yaml
 ```
 
+## Connecting to master node
+```bash
+ssh -i ./keys/id_rsa kube@$(ansible-inventory --host master01 | jq -r .ansible_host)
+```
+
 ## Static files
 
 Store static files in `/k8s/`.

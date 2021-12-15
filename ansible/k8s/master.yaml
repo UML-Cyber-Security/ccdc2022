@@ -1,4 +1,4 @@
-- hosts: k8s-masters
+- hosts: k8s_masters
   remote_user: kube
   become: yes
   tasks:

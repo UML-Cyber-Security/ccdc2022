@@ -1,5 +1,5 @@
 ---
-- hosts: 'k8s-workers, k8s-masters'
+- hosts: 'k8s_workers, k8s_masters'
   become: yes
   remote_user: kube
   become_method: sudo
