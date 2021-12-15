@@ -66,6 +66,15 @@
       line: "%{{ CCDC_Group }} ALL=(ALL) NOPASSWD: ALL"
     tags:
     - group
+  
+  - name: Enable key ssh login
+    lineinfile: 
+      dest: "{{ sshd_config }}" 
+      regexp: '^#?PubkeyAuthentication' 
+      line: 'PubkeyAuthentication yes'
+    notify: restart sshd
+    tags:
+    - ssh
 
   - name: Disable empty password login
     lineinfile: 
