@@ -48,6 +48,11 @@
         name: "{{ inventory_hostname }}"
       tags:
       - hostname
+    
+    - name: Install docker-compose
+      apt:
+        name: docker-compose
+        state: present
   
   handlers:
   - name: restart docker
