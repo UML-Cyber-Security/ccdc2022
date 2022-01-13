@@ -35,3 +35,4 @@ The green circle indicates that the server has successfully been installed and t
 sudo systemctl enable ssh
 sudo systemctl start ssh
 ```
+[SSH security script](https://gitlab.cyber.uml.edu/ccdc/ccdc2022/-/blob/main/ccdc2021/Documentation/OperatingSystems/Arch/services/ssh/secureSSH.sh)
