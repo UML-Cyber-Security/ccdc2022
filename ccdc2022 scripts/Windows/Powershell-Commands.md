@@ -1,1 +1,3 @@
 # Placeholder
+
+![](screenshot.png)
