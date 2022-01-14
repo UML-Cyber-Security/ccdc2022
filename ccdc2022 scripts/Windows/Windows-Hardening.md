@@ -1,4 +1,3 @@
-
 # General
 
 Edit GP registry values: 
@@ -31,6 +30,6 @@ Invoke-GPUpdate
 Guide to disable null sessions via Group Policy: https://social.technet.microsoft.com/Forums/windowsserver/en-US/e56374b4-6132-4aae-ab6b-349e5d355575/disable-null-sessions-on-domain-controllers-and-member-servers?forum=winserverGP
 
 
-```Set-GPRegistryValue -Name "TestGPO" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\LSA\RestrictAnonymous" -ValueName "ScreenSaveTimeOut" -Type DWORD -Value 900````
+```Set-GPRegistryValue -Name "TestGPO" -Key "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\LSA" -ValueName "RestrictAnonymous" -Type DWORD -Value 1```
 
 
