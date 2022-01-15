@@ -121,8 +121,8 @@ read RSYS
 if [ $RSYS -ne 0 ]; then
     apt-get -q install rsyslog
     systemctl --now enable rsyslog
-    sed -n '/FileCreateMode/c$FileCreateMode 0640' /etc/rsyslog.conf
-    sed -n '/FileCreateMode/c$FileCreateMode 0640' /etc/rsyslog.d/*.conf
+    sed -i '/FileCreateMode/c\$FileCreateMode 0640' /etc/rsyslog.conf
+    sed -i '/FileCreateMode/c\$FileCreateMode 0640' /etc/rsyslog.d/*.conf
 fi
 
 # Cron stuff.
