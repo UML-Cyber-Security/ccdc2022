@@ -50,12 +50,13 @@ apt-get -q install ufw
 cp /etc/ufw/user.rules /etc/ufw/user.rules.backup
 ufw default deny incoming
 ufw default deny outgoing
-ufw default deny 
+ufw default deny routed
 ufw allow in 22/tcp 
 ufw allow in 443/tcp
 ufw allow out 53/udp
 ufw allow out 80/tcp
 ufw allow out 443/tcp
+ufw allow out 1514/tcp
 ufw enable
 ufw status verbose
 
@@ -71,9 +72,10 @@ echo "net.ipv4.icmp_ignore_bogus_error_responses = 1" >> /etc/sysctl.d/ccdc.conf
 echo "net.ipv4.conf.all.rp_filter = 1" >> /etc/sysctl.d/ccdc.conf # Reverse path filtering
 echo "net.ipv4.conf.default.rp_filter = 1" >> /etc/sysctl.d/ccdc.conf #Reverse path filtering
 echo "net.ipv4.tcp_syncookies = 1" >> /etc/sysctl.d/ccdc.conf #Enable syn cookies 
+echo "kernel.randomize_va_space = 2" >> /etc/sysctl.d/ccdc.conf #Enable ASLR
 
 sysctl -w net.ipv4.route.flush=1
-
+sysctl -w kernel.randomize_va_space=2
 
 
 
@@ -83,27 +85,35 @@ if [ $AUD -ne 0 ]; then
     apt-get -q install auditd audispd-plugins
     systemctl --now enable auditd
     touch /etc/audit/rules.d/ccdc.rules
+    chown root:root /etc/audit/rules.d/ccdc.rules
 
-    echo "-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change | -a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change | -a always,exit -F arch=b64 -S clock_settime -k time-change -a always,exit -F arch=b32 -S clock_settime -k time-change | -w /etc/localtime -p wa -k time-change" >> /etc/audit/rules.d/ccdc.rules # Log modifications to date and time.
+    echo "-a always,exit -F arch=b64 -S adjtimex -S settimeofday -k time-change | -a always,exit -F arch=b32 -S adjtimex -S settimeofday -S stime -k time-change | -a always,exit -F arch=b64 -S clock_settime -k time-change -a always,exit -F arch=b32 -S clock_settime -k time-change | -w /etc/localtime -p wa -k time-change" >> /etc/audit/rules.d/ccdc.rules # Log modifications to date and time. (2611)
 
-    echo "-w /etc/group -p wa -k identity | -w /etc/passwd -p wa -k identity | -w /etc/gshadow -p wa -k identity | -w /etc/shadow -p wa -k identity | -w /etc/security/opasswd -p wa -k" >> /etc/audit/rules.d/ccdc.rules #Log group modifications
+    echo "-w /etc/group -p wa -k identity | -w /etc/passwd -p wa -k identity | -w /etc/gshadow -p wa -k identity | -w /etc/shadow -p wa -k identity | -w /etc/security/opasswd -p wa -k" >> /etc/audit/rules.d/ccdc.rules #Log group modifications (2612)
 
-    echo "-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-locale   -a always,exit -F arch=b32 -S sethostname -S setdomainname -k system-locale       -w /etc/issue -p wa -k system-locale          -w /etc/issue.net -p wa -k system-locale           -w /etc/hosts -p wa -k system-locale         -w /etc/network -p wa -k system-locale" >> /etc/audit/rules.d/ccdc.rules #log modifications to host/domain name
+    echo "-a always,exit -F arch=b64 -S sethostname -S setdomainname -k system-locale   -a always,exit -F arch=b32 -S sethostname -S setdomainname -k system-locale       -w /etc/issue -p wa -k system-locale          -w /etc/issue.net -p wa -k system-locale           -w /etc/hosts -p wa -k system-locale         -w /etc/network -p wa -k system-locale" >> /etc/audit/rules.d/ccdc.rules #log modifications to host/domain name (2613)
 
-    echo "-w /etc/apparmor/ -p wa -k MAC-policy | -w /etc/apparmor.d/ -p wa -k MAC-policy" >> /etc/audit/audit.rules # log modifications to AppArmor's Mandatory Acces Controls
+    echo "-w /etc/apparmor/ -p wa -k MAC-policy | -w /etc/apparmor.d/ -p wa -k MAC-policy" >> /etc/audit/rules.d/ccdc.rules # log modifications to AppArmor's Mandatory Acces Controls (2614)
     
-    echo "-w /var/log/faillog -p wa -k logins | -w /var/log/lastlog -p wa -k logins | -w /var/log/tallylog -p wa -k logins" >> /etc/audit/rules.d/ccdc.rules #Collect login/logout information
+    echo "-w /var/log/faillog -p wa -k logins | -w /var/log/lastlog -p wa -k logins | -w /var/log/tallylog -p wa -k logins" >> /etc/audit/rules.d/ccdc.rules #Collect login/logout information (2615)
 
+    echo "-w /var/run/utmp -p wa -k session | -w /var/log/wtmp -p wa -k logins | -w /var/log/btmp -p wa -k logins" >> /etc/audit/rules.d/ccdc.rules # Collect session initiation info (2616)
 
-    echo "-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access | -a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access | -a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access | -a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access" >> /etc/audit/rules.d/ccdc.rules #Collect unsuccessful unauthorized file access attempts
+    echo "-a always,exit -F arch=b64 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod | -a always,exit -F arch=b32 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod | -a always,exit -F arch=b64 -S chown -S fchown -S fchownat -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod | -a always,exit -F arch=b32 -S chown -S fchown -S fchownat -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod | -a always,exit -F arch=b64 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod | -a always,exit -F arch=b32 -S setxattr -S lsetxattr -S fsetxattr -S removexattr -S lremovexattr -S fremovexattr -F auid>=1000 -F auid!=4294967295 -k perm_mod" >> /etc/audit/rules.d/ccdc.rules #collect file permision changes (2617)
 
-    echo "-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts | -a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts" >> /etc/audit/rules.d/ccdc.rules #Collect successful File system mounts
+    echo "-a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access | -a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EACCES -F auid>=1000 -F auid!=4294967295 -k access | -a always,exit -F arch=b64 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access | -a always,exit -F arch=b32 -S creat -S open -S openat -S truncate -S ftruncate -F exit=-EPERM -F auid>=1000 -F auid!=4294967295 -k access" >> /etc/audit/rules.d/ccdc.rules #Collect unsuccessful unauthorized file access attempts (2618)
 
-    echo "-w /etc/sudoers -p wa -k scope | -w /etc/sudoers.d/ -p wa -k scope" >> /etc/audit/audit.rules #Collect modifications to sudoers
+    echo "-a always,exit -F arch=b64 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts | -a always,exit -F arch=b32 -S mount -F auid>=1000 -F auid!=4294967295 -k mounts" >> /etc/audit/rules.d/ccdc.rules #Collect successful File system mounts (2619)
 
-    echo "-w /sbin/insmod -p x -k modules | -w /sbin/rmmod -p x -k modules | -w /sbin/modprobe -p x -k modules | -a always,exit -F arch=b64 -S init_module -S delete_module -k modules" >> /etc/audit/rules.d/ccdc.rules # Collect kernel module loading/unloading
+    echo "-a always,exit -F arch=b64 -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete | -a always,exit -F arch=b32 -S unlink -S unlinkat -S rename -S renameat -F auid>=1000 -F auid!=4294967295 -k delete" >> /etc/audit/rules.d/ccdc.rules #Collect file deletion events (2620)
 
-    echo "-e 2" >> /etc/audit/rules.d/99-finalize.rules # Make audit logs immutable.
+    echo "-w /etc/sudoers -p wa -k scope | -w /etc/sudoers.d/ -p wa -k scope" >> /etc/audit/rules.d/ccdc.rules #Collect modifications to sudoers (2621)
+
+# 2622 goes here. Need to figure out what's up with sudo logging
+
+    echo "-w /sbin/insmod -p x -k modules | -w /sbin/rmmod -p x -k modules | -w /sbin/modprobe -p x -k modules | -a always,exit -F arch=b64 -S init_module -S delete_module -k modules" >> /etc/audit/rules.d/ccdc.rules # Collect kernel module loading/unloading (2623)
+
+    echo "-e 2" >> /etc/audit/rules.d/99-finalize.rules # Make audit logs immutable. (2624)
 fi
 
 echo "[!] Set up rsyslog? (1/0 for y/n) "
@@ -168,3 +178,4 @@ echo "Please make sure you modify the firewall rules to reenable your services"
 echo "Please make sure you modify the firewall rules to reenable your services"
 echo "Please make sure you modify the firewall rules to reenable your services"
 echo "Did you read the above messages?"
+echo "Once these are done, you should restart this machine"
