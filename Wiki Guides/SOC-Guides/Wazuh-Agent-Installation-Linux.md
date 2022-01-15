@@ -61,4 +61,11 @@ sudo systemctl start wazuh-agent
 ![](ELK-Stack-Agent-Deployment-Linux-Part3.png)
 
 
+
+
+
+**Note: Linux Hardening Script may remove the functionality. Make sure to allow port 1514 outgoing through ufw**
+
+
 That's it. Your machine is now registered.
+
