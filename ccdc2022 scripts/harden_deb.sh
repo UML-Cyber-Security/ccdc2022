@@ -1,7 +1,7 @@
 #! /bin/bash
 
-
-history > ~//copied-bash-history
+# Make a copy of the bash history before we harden this.
+history > ~/copied-bash-history
 
 if [ $EUID -ne 0 ]; then
     echo "Please run me as a superuser!"
@@ -43,10 +43,10 @@ apt purge rsh-client
 
 
 #Firewall stuff!
-
+echo "[+] Firewall Rules being cleared."
 apt-get -q install ufw
 
-
+# Create a backup of the firewall rules in case a service goes down.
 cp /etc/ufw/user.rules /etc/ufw/user.rules.backup
 ufw default deny incoming
 ufw default deny outgoing
@@ -59,6 +59,7 @@ ufw allow out 443/tcp
 ufw enable
 ufw status verbose
 
+echo "[+] Firewall rules cleared and backup made."
 
 #disable ICMP broadcast
 touch /etc/sysctl.d/ccdc.conf
@@ -76,7 +77,7 @@ sysctl -w net.ipv4.route.flush=1
 
 
 
-echo "Do you want to set up auditd? (1 for yes, 0 for no) "
+echo "[!] Do you want to set up auditd? (1 for yes, 0 for no) "
 read AUD
 if [ $AUD -ne 0 ]; then
     apt-get -q install auditd audispd-plugins
@@ -105,7 +106,7 @@ if [ $AUD -ne 0 ]; then
     echo "-e 2" >> /etc/audit/rules.d/99-finalize.rules # Make audit logs immutable.
 fi
 
-echo "Set up rsyslog? (1/0 for y/n) "
+echo "[!] Set up rsyslog? (1/0 for y/n) "
 read RSYS
 if [ $RSYS -ne 0 ]; then
     apt-get -q install rsyslog
@@ -130,7 +131,7 @@ chmod og-rwx /etc/cron.daily
 chmod og-rwx /etc/cron.weekly
 chmod og-rwx /etc/cron.monthly
 
-echo "Switch to allow list for cron? (1/0 for y/n) "
+echo "[!] Switch to allow list for cron? (1/0 for y/n) "
 echo "It is more secure but there may be additional modifications required"
 read CRONALLOW
 if [ $CRONALLOW -ne 0 ]; then
@@ -149,14 +150,21 @@ apt-get -q upgrade #install updated packages
 
 #Might have time to fix this up in time for deadline, but just in case
 
-echo "Will this machine be acting as an LDAP client? (1 for yes, 0 for no) "
+echo "[!] Will this machine be acting as an LDAP client? (1 for yes, 0 for no) "
 read LDAP
 if [ $LDAP -eq 0 ]; then
     apt purge ldap-utils
 fi
 
 
+echo "----------------- FINAL CONSIDERATIONS -----------------"
 echo "You should manually check /etc/shadow and make sure that everyone has a password"
 echo "You should check /etc/group and make sure that the shadow group is empty"
 echo "You should check /etc/passwd and make sure that root is the only user with UID 0"
 echo "Please make sure you modify the firewall rules to reenable your services"
+echo "Please make sure you modify the firewall rules to reenable your services"
+echo "Please make sure you modify the firewall rules to reenable your services"
+echo "Please make sure you modify the firewall rules to reenable your services"
+echo "Please make sure you modify the firewall rules to reenable your services"
+echo "Please make sure you modify the firewall rules to reenable your services"
+echo "Did you read the above messages?"
