@@ -11,6 +11,26 @@ Write-Output " ______           __      _______                __               
 
 $GroupPolicy = Read-Host "Please enter the name of the group policy"
 
+Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" -ValueName "DontDisplayLastUserName" -Type REG_DWORD -Value 1
+
+
+Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" -ValueName "ScRemoveOption" -Type REG_SZ -Value "1"
+
+
+Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters" -ValueName "RequireSecuritySignature" -Type REG_DWORD -Value 1
+
+
+Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa" -ValueName "DisableDomainCreds" -Type REG_DWORD -Value 1
+
+
+Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0" -ValueName "NTLMMinServerSec" -Type REG_DWORD -Value 537395200
+
+
+Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0" -ValueName "NTLMMinClientSec" -Type REG_DWORD -Value 537395200
+
+
+Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKLM\\System\\CurrentControlSet\\Control\\Lsa" -ValueName "RestrictAnonymous" -Type REG_DWORD -Value 1
+
 
 Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa" -ValueName "LimitBlankPasswordUse" -Type REG_DWORD -Value 1
 
