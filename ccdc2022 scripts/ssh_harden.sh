@@ -1,4 +1,8 @@
 #!/bin/bash
+if [ $EUID -ne 0 ]; then
+    echo "Run me as a superuser"
+    exit 1
+fi
 echo "[+] Backing up old config to /etc/ssh/sshd_config.backup"
 cp /etc/ssh/sshd_config /etc/ssh/sshd_config.backup
 echo "[+] Changing protocol to 2 (V1 is insecure)"
