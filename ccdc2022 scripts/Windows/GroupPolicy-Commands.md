@@ -1,6 +1,48 @@
 # IMPORTANT
 Make sure to force update the group policy or changes WILL NOT take place
 
+# Ensure 'Interactive logon: Do not display last user name' is set to 'Enabled'
+`Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System" -ValueName "DontDisplayLastUserName" -Type REG_DWORD -Value 1`
+
+(https://www.stigviewer.com/stig/windows_server_2012_member_server/2014-01-07/finding/V-11806)
+Severity: Low
+
+# Ensure 'Interactive logon: Smart card removal behavior' is set to 'Lock Workstation' or higher
+`Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\Software\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon" -ValueName "ScRemoveOption" -Type REG_SZ -Value "1"`
+
+(https://www.stigviewer.com/stig/windows_7/2014-04-02/finding/V-1157)
+Severity: Medium
+
+# Ensure 'Microsoft network client: Digitally sign communications (always)' is set to 'Enabled'
+`Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Services\\LanmanWorkstation\\Parameters" -ValueName "RequireSecuritySignature" -Type REG_DWORD -Value 1`
+
+(https://www.stigviewer.com/stig/windows_server_2012_member_server/2014-01-07/finding/V-6833)
+Severity: Medium
+
+# Ensure 'Network access: Do not allow storage of passwords and credentials for network authentication' is set to 'Enabled'
+`Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa" -ValueName "DisableDomainCreds" -Type REG_DWORD -Value 1`
+
+(https://www.stigviewer.com/stig/windows_8/2014-01-07/finding/V-3376)
+Severity: Medium
+
+# Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) clients' is set to 'Require NTLMv2 session security, Require 128-bit encryption'
+`Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0" -ValueName "NTLMMinServerSec" -Type REG_DWORD -Value 537395200`
+
+(https://www.stigviewer.com/stig/windows_server_2008_r2_member_server/2014-04-02/finding/V-3666)
+Severity: Medium
+
+# Ensure 'Network security: Minimum session security for NTLM SSP based (including secure RPC) servers' is set to 'Require NTLMv2 session security, Require 128-bit encryption'
+`Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa\\MSV1_0" -ValueName "NTLMMinClientSec" -Type REG_DWORD -Value 537395200`
+
+(https://www.stigviewer.com/stig/windows_10/2018-04-06/finding/V-63805)
+Severity: Medium
+
+# Ensure Null sessions are not allowed
+`Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKLM\\System\\CurrentControlSet\\Control\\Lsa" -ValueName "RestrictAnonymous" -Type REG_DWORD -Value 1`
+
+(https://www.stigviewer.com/stig/microsoft_windows_server_20122012_r2_member_server/2021-03-05/finding/V-225493)
+Severity: High
+
 # Ensure 'Accounts: Limit local account use of blank passwords to console logon only' is set to 'Enabled'
 `Set-GPRegistryValue -Name "$GroupPolicy" -Key "HKEY_LOCAL_MACHINE\\System\\CurrentControlSet\\Control\\Lsa" -ValueName "LimitBlankPasswordUse" -Type REG_DWORD -Value 1`
 
