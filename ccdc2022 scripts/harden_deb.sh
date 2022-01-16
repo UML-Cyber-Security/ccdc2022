@@ -45,6 +45,8 @@ apt purge nis
 apt purge talk
 apt purge rsh-client 
 
+# Sudo logging and other stuff.
+echo 'Defaults use_pty' | sudo EDITOR="tee -a" visudo
 
 
 #Firewall stuff!
