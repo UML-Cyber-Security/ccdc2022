@@ -102,3 +102,6 @@ if [ $(cat /etc/ssh/sshd_config | grep MaxSessions | wc -l) -eq 0 ]; then
 else
     sed -i '/MaxSessions /c\MaxSessions 10' /etc/ssh/sshd_config
 fi
+
+echo "[+] Restarting SSH to apply changes"
+sudo systemctl restart ssh
