@@ -7,6 +7,9 @@ if [ $EUID -ne 0 ]; then
     echo "Please run me as a superuser!"
     exit 1
 fi
+
+groupadd sugroup
+echo "auth required pam_wheel.so use_uid group=sugroup" >> /etc/pam.d/su
 apt-get -q purge autofs #disable automounting
 apt-get -q install sudo #make sure sudo is installed
 aa-enforce /etc/apparmor.d/* #Set AppArmor
@@ -14,21 +17,23 @@ aa-enforce /etc/apparmor.d/* #Set AppArmor
 chown root:root /etc/motd
 chmod u-x,go-wx /etc/motd 
 
+# Make sure that all of the permissions on password files are correct. 
 chown root:root /etc/group
-chmod 644 /etc/group
-chown root:root /etc/passwd
-chmod 644 /etc/passwd
 chown root:shadow /etc/gshadow
-chmod o-rwx,g-wx /etc/gshadow
+chown root:root /etc/passwd
 chown root:shadow /etc/shadow
-chmod o-rwx,g-wx /etc/shadow
-chown root:root /etc/group-
-chmod 644 /etc/group-
 chown root:root /etc/passwd-
-chmod 644 /etc/passwd-
 chown root:shadow /etc/gshadow-
-chmod o-rwx,g-wx /etc/gshadow-
+chown root:root /etc/group-
 chown root:shadow /etc/shadow-
+
+chmod 644 /etc/group
+chmod 644 /etc/passwd
+chmod o-rwx,g-wx /etc/gshadow
+chmod o-rwx,g-wx /etc/shadow
+chmod 644 /etc/group-
+chmod 644 /etc/passwd-
+chmod o-rwx,g-wx /etc/gshadow-
 chmod o-rwx,g-wx /etc/shadow-
 
 systemctl --now disable rsync #rsync is considered insecure
